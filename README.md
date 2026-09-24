@@ -2,7 +2,6 @@
 
 English | [Français](README.fr.md)
 
-[![Latest release](https://img.shields.io/github/v/release/Jostophe-021/mcp-cross-model-delegation?label=release)](https://github.com/Jostophe-021/mcp-cross-model-delegation/releases/latest)
 [![Tests](https://github.com/Jostophe-021/mcp-cross-model-delegation/actions/workflows/tests.yml/badge.svg)](https://github.com/Jostophe-021/mcp-cross-model-delegation/actions/workflows/tests.yml)
 [![Security](https://github.com/Jostophe-021/mcp-cross-model-delegation/actions/workflows/security.yml/badge.svg)](https://github.com/Jostophe-021/mcp-cross-model-delegation/actions/workflows/security.yml)
 ![Python 3.12 and 3.13](https://img.shields.io/badge/python-3.12%20%7C%203.13-blue)
