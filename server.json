@@ -12,7 +12,6 @@
     {
       "registryType": "oci",
       "identifier": "ghcr.io/jostophe-021/mcp-cross-model-delegation:0.1.0",
-      "version": "0.1.0",
       "runtimeHint": "docker",
       "transport": {
         "type": "streamable-http",
