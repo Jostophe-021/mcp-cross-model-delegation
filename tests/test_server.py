@@ -2,6 +2,7 @@ import pytest
 
 import gateway
 import server
+from providers.fake import FakeProvider
 
 
 @pytest.mark.parametrize("status", [429, 500, 502, 503, 504])
@@ -35,9 +36,19 @@ def test_configuration_and_input_errors_are_distinct():
 
 
 def test_mcp_tool_uses_injected_gateway_without_network(monkeypatch):
-    class FakeGateway:
-        def delegate(self, task, context):
-            return {"model": "fake", "answer": f"{task}:{context}"}
+    provider = FakeProvider("done")
+    monkeypatch.setattr(server, "configured_providers", lambda: {"gemini": provider})
+    result = server.gemini_delegate_task("test", "data")
+    assert result["answer"] == "done"
+    assert result["trace"]["routing_decision"]["policy"] == "manual"
+    assert server.delegate_task("test", "data", provider="gemini")["answer"] == "done"
+    assert server.delegate_task("test", "data", provider="missing")["error_code"] == (
+        "NO_ELIGIBLE_PROVIDER")
 
-    monkeypatch.setattr(server, "make_gateway", FakeGateway)
-    assert server.gemini_delegate_task("test", "data") == {"model": "fake", "answer": "test:data"}
+
+def test_legacy_extract_verifies_evidence(monkeypatch):
+    provider = FakeProvider('{"summary":"ok","findings":[{"finding":"count","evidence":'
+                            '"12 tickets","source_label":"context","uncertainty":"none"}]}')
+    monkeypatch.setattr(server, "configured_providers", lambda: {"gemini": provider})
+    result = server.gemini_extract_findings("Count?", "Monday: 12 tickets.")
+    assert result["findings"][0]["verification"]["verification_status"] == "exact"

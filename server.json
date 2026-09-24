@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Jostophe-021/mcp-cross-model-delegation",
   "title": "MCP Cross-Model Delegation",
-  "description": "Experimental local MCP bridge for bounded delegation to Gemini and evidence-backed extraction.",
-  "version": "0.1.0",
+  "description": "Local MCP framework for bounded cross-model delegation, routing and evidence verification.",
+  "version": "1.0.0",
   "repository": {
     "url": "https://github.com/Jostophe-021/mcp-cross-model-delegation",
     "source": "github"
@@ -11,7 +11,7 @@
   "packages": [
     {
       "registryType": "oci",
-      "identifier": "ghcr.io/jostophe-021/mcp-cross-model-delegation:0.1.0",
+      "identifier": "ghcr.io/jostophe-021/mcp-cross-model-delegation:1.0.0",
       "runtimeHint": "docker",
       "transport": {
         "type": "streamable-http",
@@ -20,9 +20,16 @@
       "environmentVariables": [
         {
           "name": "GEMINI_API_KEY",
-          "description": "Your own Gemini API key; pass it only at runtime.",
+          "description": "Optional Gemini API key; configure at least one provider at runtime.",
           "format": "string",
-          "isRequired": true,
+          "isRequired": false,
+          "isSecret": true
+        },
+        {
+          "name": "ANTHROPIC_API_KEY",
+          "description": "Optional Anthropic API key; configure at least one provider at runtime.",
+          "format": "string",
+          "isRequired": false,
           "isSecret": true
         }
       ]

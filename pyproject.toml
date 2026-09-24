@@ -1,20 +1,33 @@
 [project]
 name = "mcp-cross-model-delegation"
-version = "0.1.0"
-description = "Security-conscious MCP bridge and research testbed for cross-model LLM delegation."
+version = "1.0.0"
+description = "Reproducible framework for bounded cross-model delegation, routing, and evaluation."
 readme = "README.md"
 requires-python = ">=3.12"
 license = "Apache-2.0"
 dependencies = [
-  "google-genai==2.25.0",
   "mcp==2.2.0",
 ]
 
 [project.optional-dependencies]
+gemini = ["google-genai==2.25.0"]
+anthropic = ["anthropic==1.8.0"]
+all = ["google-genai==2.25.0", "anthropic==1.8.0"]
 test = ["pytest>=8.3,<10", "ruff>=0.12,<1", "jsonschema>=4.25,<5"]
 
+[project.scripts]
+crossmodel = "cli:main"
+
+[build-system]
+requires = ["setuptools>=78"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["cli", "contracts", "evidence", "execution", "gateway", "routing", "server"]
+packages = ["providers", "benchmarks"]
+
 [tool.uv]
-package = false
+package = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -2,11 +2,18 @@
 
 from typing import Any
 
+from contracts import ProviderCapabilities
+
 
 class GeminiProvider:
+    name = "gemini"
+
     def __init__(self, model: str, client: Any):
         self.model = model
         self.client = client
+
+    def capabilities(self) -> ProviderCapabilities:
+        return ProviderCapabilities(structured_output=True, evidence_extraction=True)
 
     def _generation_config(self, max_output_tokens: int) -> dict:
         return {"thinking_level": "low", "max_output_tokens": max_output_tokens}
