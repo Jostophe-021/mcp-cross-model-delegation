@@ -12,6 +12,6 @@ RUN uv sync --frozen --no-dev --extra all --no-install-project
 COPY *.py ./
 COPY providers ./providers
 COPY benchmarks ./benchmarks
-RUN uv sync --frozen --no-dev --extra all --offline
+RUN uv sync --frozen --no-dev --extra all
 USER 65532:65532
 CMD ["/app/.venv/bin/crossmodel", "serve"]
