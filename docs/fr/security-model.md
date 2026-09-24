@@ -2,14 +2,14 @@
 
 [English](../en/security-model.md) | Français
 
-**Une frontière entre modèles n'est pas en soi une frontière de sécurité.** La séparation du prompt atténue les mélanges accidentels ; elle ne garantit aucune résistance aux injections adversariales. Le point d'accès MCP est local et sans authentification. Seul l'opérateur peut décider si un texte peut être transmis à Google.
+**Une frontière entre modèles n'est pas en soi une frontière de sécurité.** La séparation du prompt atténue les mélanges accidentels sans garantir une résistance aux injections. MCP reste local et sans authentification publique. L'appelant déclare `privacy_mode` ; le Router ne devine pas la confidentialité. Seul l'opérateur décide ce qui peut être envoyé à Google ou Anthropic.
 
 | Risque | Atténuation actuelle | Limite restante |
 | --- | --- | --- |
 | Instructions cachées dans CONTEXT | TASK et CONTEXT sont deux champs JSON distincts ; le prompt subordonne explicitement CONTEXT | Le modèle peut encore suivre le texte malveillant ; tester et vérifier |
-| Exfiltration du contexte sensible | Les descriptions des outils préviennent l'appelant ; aucune lecture automatique d'application ou de fichier | L'appelant peut toujours envoyer du texte confidentiel à Google |
-| Fournisseur compromis ou indisponible | Délai d'expiration, erreurs fixes et assainies, aucun nouvel essai automatique | Le fournisseur peut être lent, faux ou malveillant |
-| Réponse ou preuve inventée | Champs de preuve structurés et exigence de vérification par l'orchestrateur | La preuve vient du modèle et n'est pas vérifiée indépendamment |
+| Exfiltration du contexte sensible | Avertissements, aucune lecture automatique, listes de fournisseurs et mode local | L'appelant peut toujours envoyer du texte confidentiel à un fournisseur externe approuvé |
+| Fournisseur compromis ou indisponible | Délai d'expiration, erreurs fixes, aucun retry applicatif, repli explicite sur erreur réessayable | Le fournisseur peut être lent, faux ou malveillant |
+| Réponse ou preuve inventée | Recherche locale de citation exacte/normalisée et hash de source | Une citation présente ne prouve pas l'affirmation |
 | JSON ou structure invalide | Demande de schéma et contrôle local strict des formes et types | Une réponse plausible peut encore être factuellement fausse |
 | Fuite dans les journaux | Aucun prompt, réponse ou télémétrie personnalisée journalisé par l'application | Le client, l'environnement, le réseau et le fournisseur peuvent journaliser séparément |
 | Écoute MCP publique accidentelle | Liste explicite d'adresses loopback ; refus d'une écoute publique sans authentification | Un utilisateur ou processus local peut atteindre le point d'accès |
@@ -17,6 +17,6 @@
 | Dépendance compromise | Dépendances directes figées, lockfile, audit CI | Le risque de chaîne d'approvisionnement demeure ; mettre à jour et examiner |
 | Réponse secondaire non vérifiée | README et outils demandent une vérification | Un orchestrateur peut échouer à vérifier |
 
-Les objets d'erreur exposent des codes et messages fixes, jamais de texte d'exception, prompt, contexte, clé ou trace de pile. Les limites d'entrée et de sortie bornent la charge mais pas les dépenses. `store=False` empêche la conservation de l'objet Interaction pour cette requête selon l'API Gemini actuelle ; les autres traitements et politiques du fournisseur s'appliquent toujours. Consultez la [documentation de Google sur les journaux](https://ai.google.dev/gemini-api/docs/logs-datasets) et les conditions de votre compte.
+Les erreurs exposent des codes et messages fixes, jamais d'exception, prompt, contexte, clé ou trace de pile. Les logs applicatifs ne portent que sur ID, opération, fournisseur, modèle, politique, durée et statut. Les limites ne sont pas un plafond financier. Un `max_cost` strict rejette un coût inconnu sauf `allow_unknown_cost` explicite. `store=False` désactive la conservation de l'objet Interaction Gemini, sans supprimer les autres traitements du fournisseur. Consultez la [documentation de Google](https://ai.google.dev/gemini-api/docs/logs-datasets) et les conditions des deux fournisseurs.
 
-Avant de connecter un produit distant, décidez de l'identité du client MCP, de l'authentification, du chiffrement du transport, des autorisations et des journaux. Le [Secure MCP Tunnel d'OpenAI](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels), facultatif, garde le serveur MCP privé mais ne supprime pas la décision de partager des données avec Google. N'exposez pas `0.0.0.0:8000` en modifiant la garde sans conception de sécurité adaptée.
+Avant de connecter un produit distant, définissez identité du client, authentification, chiffrement, autorisations et journaux. Le [Secure MCP Tunnel d'OpenAI](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels) est facultatif ; il garde l'écoute privée sans supprimer la décision de partager les données avec le fournisseur. N'exposez pas `0.0.0.0:8000` sans conception de sécurité adaptée. Aucune télémétrie personnalisée n'est activée.
