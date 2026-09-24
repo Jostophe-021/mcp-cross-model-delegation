@@ -1,0 +1,29 @@
+[project]
+name = "mcp-cross-model-delegation"
+version = "0.1.0"
+description = "Security-conscious MCP bridge and research testbed for cross-model LLM delegation."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+dependencies = [
+  "google-genai==2.25.0",
+  "mcp==2.2.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8.3,<10", "ruff>=0.12,<1", "jsonschema>=4.25,<5"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = [".uv-cache", ".uv-python"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
