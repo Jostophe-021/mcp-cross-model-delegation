@@ -74,6 +74,8 @@ docker run --rm --network host --env-file .env mcp-cross-model-delegation:0.1.0
 
 L'image ne contient aucune clé. La prise en charge du réseau hôte varie avec Docker Desktop ; utilisez Python directement si elle n'est pas disponible. Le serveur refuse volontairement `MCP_HOST=0.0.0.0`. Pour fournir un point d'accès réseau, ajoutez une authentification client et une protection du transport adaptées au lieu de supprimer cette garde dans un déploiement partagé.
 
+L'image publique `ghcr.io/jostophe-021/mcp-cross-model-delegation:0.1.0` contient le code de la même release et exige une clé fournie à l'exécution. `server.json` décrit cette image locale et son point d'accès HTTP sur loopback pour le MCP Registry. Une fiche du registre est une métadonnée permettant d'installer un serveur local, pas un service hébergé ; l'exemple Docker ci-dessus nécessite le réseau hôte sous Linux pour accéder au point d'accès.
+
 ## Configuration
 
 | Variable | Défaut | Plage sûre ou fonction |

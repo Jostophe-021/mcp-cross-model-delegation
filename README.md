@@ -74,6 +74,8 @@ docker run --rm --network host --env-file .env mcp-cross-model-delegation:0.1.0
 
 The image contains no key. Docker Desktop host networking varies by platform; use a local Python run when host networking is unavailable. The server deliberately refuses `MCP_HOST=0.0.0.0`. To offer a network endpoint, add suitable client authentication and transport security rather than changing this guard in a shared deployment.
 
+The public image `ghcr.io/jostophe-021/mcp-cross-model-delegation:0.1.0` contains the same release source and needs a key supplied at runtime. `server.json` describes that local image and its loopback HTTP endpoint for the MCP Registry. A registry listing is metadata for installing a local server, not a hosted service; the Docker example above requires Linux host networking to reach the endpoint.
+
 ## Configuration
 
 | Variable | Default | Safe range or purpose |
