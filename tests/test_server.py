@@ -52,3 +52,18 @@ def test_legacy_extract_verifies_evidence(monkeypatch):
     monkeypatch.setattr(server, "configured_providers", lambda: {"gemini": provider})
     result = server.gemini_extract_findings("Count?", "Monday: 12 tickets.")
     assert result["findings"][0]["verification"]["verification_status"] == "exact"
+
+
+def test_mcp_benchmark_routing_uses_operator_history(monkeypatch, tmp_path):
+    history = tmp_path / "history.json"
+    history.write_text('{"alpha":{"quality":0.2},"beta":{"quality":0.9}}')
+    monkeypatch.setenv("CROSSMODEL_HISTORY_PATH", str(history))
+    monkeypatch.setattr(server, "configured_providers", lambda: {
+        "alpha": FakeProvider("a"), "beta": FakeProvider("b")})
+    result = server.delegate_task("test", policy="benchmark_weighted")
+    assert result["provider"] == "beta"
+    assert result["trace"]["routing_decision"]["policy"] == "benchmark_weighted"
+
+    monkeypatch.setenv("CROSSMODEL_HISTORY_PATH", str(tmp_path / "missing.json"))
+    assert server.delegate_task("test", policy="benchmark_weighted")["error_code"] == (
+        "CONFIGURATION_ERROR")

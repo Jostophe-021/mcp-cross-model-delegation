@@ -1,14 +1,16 @@
 """Loopback-only MCP server exposing bounded, read-only delegation tools."""
 
+import json
 import os
 from dataclasses import asdict
+from pathlib import Path
 
 from mcp.server import MCPServer
 from mcp.types import ToolAnnotations
 
 from contracts import DelegationRequest, RoutingConstraints
 from execution import execute
-from gateway import Settings, safe_call
+from gateway import ConfigurationError, Settings, safe_call
 from providers import configured_providers
 from routing import BenchmarkWeightedPolicy, ManualPolicy, Router, RulesPolicy
 
@@ -20,6 +22,21 @@ server = MCPServer(
         "they do not read applications, email, or Drive, and do not execute code."
     ),
 )
+
+
+def _configured_history() -> dict:
+    path = os.getenv("CROSSMODEL_HISTORY_PATH")
+    if not path:
+        return {}
+    try:
+        history = json.loads(Path(path).read_text(encoding="utf-8"))
+        if not isinstance(history, dict) or any(
+            not isinstance(metrics, dict) for metrics in history.values()
+        ):
+            raise ValueError("Invalid benchmark history")
+        return history
+    except (OSError, ValueError) as error:
+        raise ConfigurationError("Invalid benchmark history") from error
 
 
 def _run(task: str, context: str, provider: str | None, policy: str,
@@ -35,7 +52,7 @@ def _run(task: str, context: str, provider: str | None, policy: str,
               ("gemini" if "gemini" in providers else next(iter(providers), "gemini")))
     selected_policy = (ManualPolicy(chosen) if policy == "manual" else RulesPolicy()
                        if policy == "rules" else BenchmarkWeightedPolicy())
-    router = Router(providers)
+    router = Router(providers, _configured_history() if policy == "benchmark_weighted" else {})
     result, trace = execute(DelegationRequest(task, context, constraints=limits), router,
                             selected_policy, Settings.from_env(), structured=structured)
     if result is None:
