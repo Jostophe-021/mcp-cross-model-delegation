@@ -2,13 +2,38 @@
 
 [English](README.md) | Français
 
-**Un cadre ouvert, reproductible et attentif à la sécurité pour mesurer, comparer et router des tâches délimitées entre modèles de langage hétérogènes.**
+[![Dernière version](https://img.shields.io/github/v/release/Jostophe-021/mcp-cross-model-delegation?label=version)](https://github.com/Jostophe-021/mcp-cross-model-delegation/releases/latest)
+[![Tests](https://github.com/Jostophe-021/mcp-cross-model-delegation/actions/workflows/tests.yml/badge.svg)](https://github.com/Jostophe-021/mcp-cross-model-delegation/actions/workflows/tests.yml)
+[![Sécurité](https://github.com/Jostophe-021/mcp-cross-model-delegation/actions/workflows/security.yml/badge.svg)](https://github.com/Jostophe-021/mcp-cross-model-delegation/actions/workflows/security.yml)
+![Python 3.12 et 3.13](https://img.shields.io/badge/python-3.12%20%7C%203.13-blue)
+[![Licence : Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-Le même noyau Python alimente un serveur MCP et une CLI de benchmark : **mesurer → comparer → router → vérifier → améliorer**. Il rend les décisions explicites, applique les contraintes de confidentialité et de coût fournies par l'appelant avant le score, et vérifie localement les citations dans le contexte fourni. V1 reste petite : adaptateurs Gemini et Anthropic, fournisseur factice déterministe, trois politiques, vérification des preuves et benchmark séquentiel. Aucun gain général n'est revendiqué.
+**Un cadre ouvert, reproductible et attentif à la sécurité pour mesurer, comparer, router et vérifier des tâches délimitées entre modèles de langage hétérogènes.**
+
+Un même noyau Python alimente un serveur MCP et une CLI de benchmark : **mesurer → comparer → router → vérifier → améliorer**. La V1 prend en charge Gemini, Anthropic et un fournisseur factice déterministe pour les tests hors ligne. Le routage est explicite, les citations sont vérifiées localement et aucun gain de qualité, de coût ou de latence n'est revendiqué sans mesure.
+
+```mermaid
+flowchart LR
+    A["TASK + CONTEXT"] --> B["Contraintes de l'appelant"]
+    B --> C["Router"]
+    H["Historique de benchmark"] -. "politique pondérée" .-> C
+    C --> D["Gemini ou Anthropic"]
+    D --> E["Résultat"]
+    E --> F["Vérification locale des citations<br/>pour l'extraction"]
+    E --> G["Évaluation de benchmark optionnelle"]
+    F --> G
+```
+
+## Ce que vous pouvez faire aujourd'hui
+
+- Déléguer une tâche textuelle délimitée à Gemini ou Anthropic avec la même interface.
+- Appliquer des contraintes de confidentialité, capacité, coût et latence avant la sélection ; inspecter les raisons du choix.
+- Vérifier les citations extraites dans le contexte fourni.
+- Lancer des benchmarks hors ligne sans clé API, ou activer explicitement des expériences entre fournisseurs réels.
 
 ## Pourquoi ce projet est différent
 
-Le projet fournit une boucle inspectable de mesure, exécution, vérification des preuves et évaluation. Aucun modèle ne choisit le fournisseur par défaut. La politique par défaut est `manual` ; `rules` et `benchmark_weighted` demandent un choix explicite. Un score historique ne garantit ni la latence ni la qualité future. Voir l'[architecture](docs/fr/architecture.md), la [méthodologie](docs/fr/methodology.md) et les [cas d'usage](docs/fr/use-cases.md).
+La même boucle mesure, route, exécute, vérifie les preuves et évalue les résultats. La politique par défaut est `manual` ; `rules` et `benchmark_weighted` demandent un choix explicite. Un score historique ne garantit ni la latence ni la qualité future. Voir l'[architecture](docs/fr/architecture.md), la [méthodologie](docs/fr/methodology.md) et les [cas d'usage](docs/fr/use-cases.md).
 
 ## Installer et démarrer
 
@@ -21,7 +46,10 @@ uv sync --locked --extra all --extra test
 source .venv/bin/activate
 crossmodel doctor
 crossmodel providers
+crossmodel bench run benchmarks/datasets/basic.jsonl
 ```
+
+Ce benchmark utilise `FakeProvider` et ne demande aucune clé API. Définissez `GEMINI_API_KEY` ou `ANTHROPIC_API_KEY` seulement pour appeler un vrai fournisseur.
 
 On peut aussi n'installer que l'adaptateur nécessaire : `pip install "mcp-cross-model-delegation[gemini]"` ou `pip install "mcp-cross-model-delegation[anthropic]"`. Le paquet de base n'exige aucun des deux SDK pour les benchmarks hors ligne. La publication PyPI est une étape distincte ; jusque-là, utilisez `uv sync` depuis le dépôt.
 
@@ -81,4 +109,4 @@ L'image ne contient aucune clé. Sous Linux, `docker run --rm --network host --e
 - Une plateforme d'agents autonomes, une frontière de sécurité suffisante en production ou une garantie contre l'injection de prompt.
 - Un produit officiel d'OpenAI, d'Anthropic ou de Google.
 
-Aucune télémétrie personnalisée n'est activée. Les tokens, coûts ou qualités inconnus restent inconnus. Voir la [feuille de route](docs/fr/research-roadmap.md), le [changelog](CHANGELOG.md) et le [guide de contribution](CONTRIBUTING.fr.md). Licence [Apache-2.0](LICENSE).
+Aucune télémétrie personnalisée n'est activée. Les tokens, coûts ou qualités inconnus restent inconnus. Voir la [feuille de route](docs/fr/research-roadmap.md), le [changelog](CHANGELOG.md), le [guide de contribution](CONTRIBUTING.fr.md), les [Discussions](https://github.com/Jostophe-021/mcp-cross-model-delegation/discussions) et les [informations de citation](CITATION.cff). Licence [Apache-2.0](LICENSE).

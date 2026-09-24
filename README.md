@@ -2,13 +2,38 @@
 
 English | [Français](README.fr.md)
 
-**An open, reproducible and security-conscious framework for measuring, comparing and routing bounded work between heterogeneous language models.**
+[![Latest release](https://img.shields.io/github/v/release/Jostophe-021/mcp-cross-model-delegation?label=release)](https://github.com/Jostophe-021/mcp-cross-model-delegation/releases/latest)
+[![Tests](https://github.com/Jostophe-021/mcp-cross-model-delegation/actions/workflows/tests.yml/badge.svg)](https://github.com/Jostophe-021/mcp-cross-model-delegation/actions/workflows/tests.yml)
+[![Security](https://github.com/Jostophe-021/mcp-cross-model-delegation/actions/workflows/security.yml/badge.svg)](https://github.com/Jostophe-021/mcp-cross-model-delegation/actions/workflows/security.yml)
+![Python 3.12 and 3.13](https://img.shields.io/badge/python-3.12%20%7C%203.13-blue)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-The same Python core powers an MCP server and a benchmark CLI: **measure → compare → route → verify → improve**. It makes routing decisions explicit, applies caller-supplied privacy and cost constraints before scoring, and checks model quotations against the supplied context. V1 is small: Gemini and Anthropic adapters, a deterministic fake provider, three routing policies, local evidence verification, and a sequential benchmark runner. It makes no claim that delegation is generally better.
+**An open, reproducible and security-conscious framework for measuring, comparing, routing and verifying bounded work across heterogeneous language models.**
+
+One Python core powers an MCP server and a benchmark CLI: **measure → compare → route → verify → improve**. V1 supports Gemini, Anthropic, and a deterministic fake provider for offline tests. Routing is explicit, quotation evidence is checked locally, and no improvement in quality, cost, or latency is claimed without measurement.
+
+```mermaid
+flowchart LR
+    A["TASK + CONTEXT"] --> B["Caller constraints"]
+    B --> C["Router"]
+    H["Benchmark history"] -. "weighted policy" .-> C
+    C --> D["Gemini or Anthropic"]
+    D --> E["Result"]
+    E --> F["Local quote check<br/>for extraction"]
+    E --> G["Optional benchmark evaluation"]
+    F --> G
+```
+
+## What you can do today
+
+- Delegate bounded text work to Gemini or Anthropic through one interface.
+- Apply privacy, capability, cost, and latency constraints before provider selection; inspect routing reasons.
+- Verify extracted quotations against the supplied context.
+- Run deterministic offline benchmarks without API keys, or opt in to live cross-provider experiments.
 
 ## Why this is different
 
-This project connects models, but also offers one inspectable loop for measurement, execution, evidence verification, and evaluation. A model does not choose the provider by default. The default is manual; `rules` and `benchmark_weighted` must be requested explicitly. A benchmark score is historical evidence, not a promise of future latency or quality. See the [architecture](docs/en/architecture.md), [methodology](docs/en/methodology.md), and [use cases](docs/en/use-cases.md).
+The same loop measures, routes, executes, verifies evidence, and evaluates results. The default policy is manual; `rules` and `benchmark_weighted` require explicit opt-in. Historical scores do not promise future quality or latency. See the [architecture](docs/en/architecture.md), [methodology](docs/en/methodology.md), and [use cases](docs/en/use-cases.md).
 
 ## Install and run
 
@@ -21,7 +46,10 @@ uv sync --locked --extra all --extra test
 source .venv/bin/activate
 crossmodel doctor
 crossmodel providers
+crossmodel bench run benchmarks/datasets/basic.jsonl
 ```
+
+The benchmark above uses `FakeProvider` and needs no API key. Set `GEMINI_API_KEY` or `ANTHROPIC_API_KEY` only when you want to call a real provider.
 
 Or install only the needed adapter: `pip install "mcp-cross-model-delegation[gemini]"` or `pip install "mcp-cross-model-delegation[anthropic]"`. The base package needs neither provider SDK for offline benchmarks. PyPI publication is a separate release step; until then, install from the repository with `uv sync`.
 
@@ -81,4 +109,4 @@ The Docker image contains no API keys. Under Linux, `docker run --rm --network h
 - An autonomous agent platform, a production security boundary by itself, or a prompt-injection guarantee.
 - An official OpenAI, Anthropic, or Google product.
 
-No custom telemetry is enabled. Unknown token usage, cost, and quality remain unknown. See [research roadmap](docs/en/research-roadmap.md), [changelog](CHANGELOG.md), and [contributing guide](CONTRIBUTING.md). The code is under [Apache-2.0](LICENSE).
+No custom telemetry is enabled. Unknown token usage, cost, and quality remain unknown. See the [research roadmap](docs/en/research-roadmap.md), [changelog](CHANGELOG.md), [contributing guide](CONTRIBUTING.md), [Discussions](https://github.com/Jostophe-021/mcp-cross-model-delegation/discussions), and [citation metadata](CITATION.cff). The code is under [Apache-2.0](LICENSE).

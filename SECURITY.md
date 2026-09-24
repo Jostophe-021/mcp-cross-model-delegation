@@ -8,6 +8,6 @@ Please use GitHub's **private vulnerability reporting** for this repository if i
 
 ## Scope and current risks
 
-This is an experimental preview, not a hardened service. The primary risks are indirect prompt injection in CONTEXT, accidental sharing of sensitive text with a third-party provider, output hallucination or manipulation, an invalid structured response, a compromised dependency, a misconfigured public listener, and accidental secret or payload logging. The default loopback bind, size limits, no custom telemetry, `store=False`, fixed error responses, and fake-client tests reduce some risks but do not eliminate them. A model boundary is not a security boundary by itself.
+This is a local-first research framework, not a hardened hosted service. The primary risks are indirect prompt injection in CONTEXT, accidental sharing of sensitive text with a third-party provider, output hallucination or manipulation, an invalid structured response, a compromised dependency, a misconfigured public listener, and accidental secret or payload logging. The default loopback bind, size limits, no custom telemetry, `store=False`, fixed error responses, and fake-client tests reduce some risks but do not eliminate them. A model boundary is not a security boundary by itself.
 
 Do not expose the MCP endpoint publicly without suitable authentication and transport security. Do not use secondary-model answers as the sole basis for high-impact decisions. Provider policies and the client/host logging environment also matter. See the [threat table](docs/en/security-model.md).

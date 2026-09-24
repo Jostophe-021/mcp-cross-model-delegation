@@ -1,0 +1,40 @@
+name: Provider proposal
+description: Propose one optional provider adapter.
+title: "[Provider] "
+body:
+  - type: markdown
+    attributes:
+      value: "Never include API keys, credentials, private prompts, or confidential data. Keep adapters small and SDK calls isolated."
+  - type: input
+    id: provider
+    attributes:
+      label: Provider and model family
+    validations:
+      required: true
+  - type: input
+    id: api
+    attributes:
+      label: Official API or SDK documentation
+      placeholder: "https://..."
+    validations:
+      required: true
+  - type: textarea
+    id: capabilities
+    attributes:
+      label: Capabilities and limitations
+      description: Include structured output, usage, evidence extraction, and context limits.
+    validations:
+      required: true
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Proposed implementation and offline tests
+    validations:
+      required: true
+  - type: textarea
+    id: security
+    attributes:
+      label: Security and privacy considerations
+      description: Cover data sharing, storage, retries, errors, and configuration.
+    validations:
+      required: true
