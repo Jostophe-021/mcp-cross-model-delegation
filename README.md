@@ -49,7 +49,7 @@ uv run crossmodel bench run benchmarks/datasets/basic.jsonl
 
 The benchmark above uses `FakeProvider` and needs no API key. **Software validation only — not an LLM performance result.** Set `GEMINI_API_KEY` or `ANTHROPIC_API_KEY` only when you want to call a real provider.
 
-Or install only the needed adapter: `pip install "mcp-cross-model-delegation[gemini]"` or `pip install "mcp-cross-model-delegation[anthropic]"`. The base package needs neither provider SDK for offline benchmarks. PyPI publication is a separate release step; until then, install from the repository with `uv sync`.
+From this repository, install only the needed adapter with `uv sync --locked --extra gemini` or `uv sync --locked --extra anthropic`. The base package needs neither provider SDK for offline benchmarks. PyPI publication is a separate release step; install from the repository until a PyPI release is verified.
 
 Set `GEMINI_API_KEY` and/or `ANTHROPIC_API_KEY` in your own environment. `.env.example` shows names only; never commit `.env` or paste a key into a command, issue, or chat. Set `DEFAULT_PROVIDER=anthropic` if Anthropic is your manual default. Run `crossmodel serve` to expose streamable HTTP MCP at `http://127.0.0.1:8000/mcp`. `MCP_HOST=0.0.0.0` is refused because the server has no public client authentication.
 
