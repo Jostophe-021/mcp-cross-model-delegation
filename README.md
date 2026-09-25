@@ -34,7 +34,7 @@ flowchart LR
 
 The same loop measures, routes, executes, verifies evidence, and evaluates results. The default policy is manual; `rules` and `benchmark_weighted` require explicit opt-in. Historical scores do not promise future quality or latency. See the [architecture](docs/en/architecture.md), [methodology](docs/en/methodology.md), and [use cases](docs/en/use-cases.md).
 
-## Install and run
+## Try it in 5 minutes
 
 Python 3.12 or 3.13 and [uv](https://docs.astral.sh/uv/) are supported. A Gemini API key and an Anthropic API key are independent; configure either or both. A Claude subscription does not provide Anthropic API credits.
 
@@ -47,7 +47,11 @@ uv run crossmodel providers
 uv run crossmodel bench run benchmarks/datasets/basic.jsonl
 ```
 
-The benchmark above uses `FakeProvider` and needs no API key. **Software validation only — not an LLM performance result.** Set `GEMINI_API_KEY` or `ANTHROPIC_API_KEY` only when you want to call a real provider.
+The benchmark above uses `FakeProvider` and needs no API key. **Software validation only — not an LLM performance result.** See the [four offline examples](examples/README.md).
+
+## Try a real provider
+
+Set `GEMINI_API_KEY` or `ANTHROPIC_API_KEY` only when you intend to call a real provider. **Live API usage may incur provider charges.** Start with synthetic or redistributable text, and inspect the planned call count before a live benchmark.
 
 From this repository, install only the needed adapter with `uv sync --locked --extra gemini` or `uv sync --locked --extra anthropic`. The base package needs neither provider SDK for offline benchmarks. PyPI publication is a separate release step; install from the repository until a PyPI release is verified.
 
@@ -100,6 +104,31 @@ docker build -t mcp-cross-model-delegation:1.0.0 .
 ```
 
 The Docker image contains no API keys. Under Linux, `docker run --rm --network host --env-file .env mcp-cross-model-delegation:1.0.0` keeps the MCP listener on host loopback. Docker Desktop host networking varies; local Python is the simpler option. The release workflow publishes `ghcr.io/jostophe-021/mcp-cross-model-delegation:1.0.0` with OCI metadata and an SPDX SBOM. The optional [OpenAI Secure MCP Tunnel](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels) can connect a compatible remote client without opening an inbound port; this repository includes no tunnel identifier or credential.
+
+## MCP Registry
+
+Version `1.0.0` was accepted by the official MCP Registry publisher as `io.github.Jostophe-021/mcp-cross-model-delegation`. Its declared package is the public [GHCR image](https://github.com/Jostophe-021/mcp-cross-model-delegation/pkgs/container/mcp-cross-model-delegation). The Registry remains a preview service; check its current listing before relying on discovery.
+
+## Research
+
+This project is designed to test when delegation helps, when it does not, and which trade-offs it introduces. Start with the [methodology](docs/en/methodology.md), [research roadmap](docs/en/research-roadmap.md), [synthetic dataset and benchmark format](benchmarks/README.md), [result schema](benchmarks/result_schema.json), and [first live experiment guide](docs/en/first-experiment.md). Publish only non-sensitive raw results, a summary, and limitations; cite the version using [CITATION.cff](CITATION.cff).
+
+## Build your own version
+
+```text
+Fork → Provider / Policy / Evaluator / Dataset → Your derivative project
+                                                ↘ Optional upstream contribution
+```
+
+The [extending guide](docs/en/extending.md) shows the V1 interfaces and their current limits. The [contributing guide](CONTRIBUTING.md) explains how to keep a fork current with upstream.
+
+## Forks and derivative projects
+
+Forking and adaptation are explicitly welcome. On GitHub, use **Fork** when you want the upstream relationship to remain visible. Independent derivative projects are also permitted under Apache-2.0, subject to the applicable license and attribution requirements. Generic improvements are welcome upstream; forks are free to diverge. Preserve the applicable [LICENSE](LICENSE) and [NOTICE](NOTICE), identify your changes, and cite the original project when relevant.
+
+## Related work and support
+
+Generic cross-model delegation predates this project. The [related work](docs/en/related-work.md) page links to existing bridges, multi-provider systems, routing, and evaluation tools. For usage and research questions, see [SUPPORT.md](SUPPORT.md) and [Discussions](https://github.com/Jostophe-021/mcp-cross-model-delegation/discussions); report vulnerabilities through [private reporting](SECURITY.md).
 
 ## This is not
 

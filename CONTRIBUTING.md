@@ -4,6 +4,18 @@ English | [Français](CONTRIBUTING.fr.md)
 
 This is a small research framework. Small, testable changes and explicit assumptions are preferred.
 
+## Fork and upstream
+
+If `origin` points to your GitHub fork, `upstream` names the original repository. From your fork checkout:
+
+```bash
+git remote add upstream https://github.com/Jostophe-021/mcp-cross-model-delegation.git
+git fetch upstream
+git rebase upstream/main
+```
+
+Add `upstream` once. Rebase only your own unshared branch; resolve conflicts before pushing. Independent forks and upstream contributions are both welcome. See the [extension guide](docs/en/extending.md) for the V1 contracts.
+
 1. Install Python 3.12 or 3.13 and `uv`; run `uv sync --locked --extra all --extra test`.
 2. Run `uv run pytest -q` and `uv run ruff check gateway.py server.py contracts.py routing.py execution.py evidence.py cli.py providers benchmarks tests` before proposing a change. Unit tests must never require a real API key or network call.
 3. Open an issue describing the problem, expected behavior, security or research impact, and a minimal **synthetic** example. Propose changes through a focused pull request.

@@ -34,7 +34,7 @@ flowchart LR
 
 La même boucle mesure, route, exécute, vérifie les preuves et évalue les résultats. La politique par défaut est `manual` ; `rules` et `benchmark_weighted` demandent un choix explicite. Un score historique ne garantit ni la latence ni la qualité future. Voir l'[architecture](docs/fr/architecture.md), la [méthodologie](docs/fr/methodology.md) et les [cas d'usage](docs/fr/use-cases.md).
 
-## Installer et démarrer
+## Essayer en cinq minutes
 
 Python 3.12 ou 3.13 et [uv](https://docs.astral.sh/uv/) sont pris en charge. Les clés API Gemini et Anthropic sont indépendantes : configurez l'une ou les deux. Un abonnement Claude ne fournit pas de crédits API Anthropic.
 
@@ -47,7 +47,11 @@ uv run crossmodel providers
 uv run crossmodel bench run benchmarks/datasets/basic.jsonl
 ```
 
-Ce benchmark utilise `FakeProvider` et ne demande aucune clé API. **Validation du logiciel uniquement — pas un résultat de performance des LLM.** Définissez `GEMINI_API_KEY` ou `ANTHROPIC_API_KEY` seulement pour appeler un vrai fournisseur.
+Ce benchmark utilise `FakeProvider` et ne demande aucune clé API. **Validation du logiciel uniquement — pas un résultat de performance des LLM.** Voir les [quatre exemples hors ligne](examples/README.md).
+
+## Essayer un vrai fournisseur
+
+Définissez `GEMINI_API_KEY` ou `ANTHROPIC_API_KEY` seulement si vous souhaitez appeler un vrai fournisseur. **Les appels API réels peuvent être facturés.** Commencez avec du texte synthétique ou redistribuable et vérifiez le nombre d'appels prévu avant un benchmark réel.
 
 Depuis ce dépôt, installez seulement l'adaptateur nécessaire avec `uv sync --locked --extra gemini` ou `uv sync --locked --extra anthropic`. Le paquet de base n'exige aucun des deux SDK pour les benchmarks hors ligne. La publication PyPI est une étape distincte ; installez depuis le dépôt tant qu'une publication PyPI n'est pas vérifiée.
 
@@ -100,6 +104,31 @@ docker build -t mcp-cross-model-delegation:1.0.0 .
 ```
 
 L'image ne contient aucune clé. Sous Linux, `docker run --rm --network host --env-file .env mcp-cross-model-delegation:1.0.0` conserve l'écoute sur loopback ; le réseau hôte de Docker Desktop varie selon la plateforme. Le workflow de release publie `ghcr.io/jostophe-021/mcp-cross-model-delegation:1.0.0` avec les métadonnées OCI et une SBOM SPDX. Le [Secure MCP Tunnel d'OpenAI](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels) est facultatif pour un client distant compatible ; ce dépôt ne contient aucun identifiant de tunnel ni secret.
+
+## MCP Registry
+
+La version `1.0.0` a été acceptée par l'outil officiel de publication MCP Registry sous le nom `io.github.Jostophe-021/mcp-cross-model-delegation`. Le paquet déclaré est l'[image GHCR publique](https://github.com/Jostophe-021/mcp-cross-model-delegation/pkgs/container/mcp-cross-model-delegation). Le Registry reste un service en préversion ; vérifiez son entrée actuelle avant de dépendre de la découverte.
+
+## Recherche
+
+Le projet sert à étudier quand la délégation aide, quand elle n'aide pas et quels compromis elle introduit. Commencez par la [méthodologie](docs/fr/methodology.md), la [feuille de route](docs/fr/research-roadmap.md), le [jeu synthétique et le format de benchmark](benchmarks/README.fr.md), le [schéma des résultats](benchmarks/result_schema.json) et le [guide de première expérience](docs/fr/first-experiment.md). Publiez uniquement des résultats bruts non sensibles, une synthèse et les limites ; citez la version avec [CITATION.cff](CITATION.cff).
+
+## Créer votre propre version
+
+```text
+Fork → Fournisseur / Politique / Évaluateur / Jeu de données → Votre dérivé
+                                                        ↘ Contribution amont facultative
+```
+
+Le [guide d'extension](docs/fr/extending.md) présente les interfaces V1 et leurs limites. Le [guide de contribution](CONTRIBUTING.fr.md) explique comment suivre l'amont.
+
+## Forks et projets dérivés
+
+Les forks et adaptations sont bienvenus. Sur GitHub, la fonction **Fork** rend visible le lien avec le dépôt d'origine. Les projets dérivés indépendants sont également permis par Apache-2.0, sous réserve de ses obligations de licence et d'attribution applicables. Les améliorations génériques sont bienvenues en amont ; les forks restent libres de diverger. Conservez les fichiers [LICENSE](LICENSE) et [NOTICE](NOTICE) applicables, indiquez vos changements et citez le projet d'origine si pertinent.
+
+## Travaux liés et aide
+
+La délégation générique entre modèles est antérieure à ce projet. La page [travaux liés](docs/fr/related-work.md) renvoie vers des ponts, systèmes multifournisseurs, routeurs et outils d'évaluation. Pour l'usage et la recherche, voir [SUPPORT.md](SUPPORT.md) et les [Discussions](https://github.com/Jostophe-021/mcp-cross-model-delegation/discussions) ; signalez les vulnérabilités par [voie privée](SECURITY.fr.md).
 
 ## Ce que ce projet n'est pas
 

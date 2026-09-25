@@ -2,17 +2,20 @@
 
 [English](../en/use-cases.md) | Français
 
-| Cas | Statut V1 | Capacité réelle |
-| --- | --- | --- |
-| Déléguer un long contexte | Disponible | Texte borné, sans gain revendiqué. |
-| Obtenir un second avis indépendant | Disponible | Appel manuel à un autre fournisseur ; vérification par l'appelant. |
-| Extraction avec preuves | Disponible | Résultats structurés, offsets locaux et hash. |
-| Comparaison entre fournisseurs | Disponible | Mêmes primitives pour Gemini, Anthropic et Fake. |
-| Recherche sur l'injection de prompt | Disponible | Jeu synthétique et évaluateur déterministe limité. |
-| Détection des erreurs du modèle secondaire | Extension possible | Fixture d'erreur ; étude de correction non incluse. |
-| Routage contraint par coût | Disponible | Plafond strict rejetant les coûts inconnus sauf autorisation explicite. |
-| Routage contraint par latence | Disponible | Filtre historique sans garantie future. |
-| Routage contraint par confidentialité | Disponible | Modes déclarés par l'appelant et listes de fournisseurs. |
-| Planification future des modèles | Recherche future | Aucun ordonnanceur ni apprentissage adaptatif en V1. |
+## Disponibles en V1
 
-Ces contraintes peuvent servir à examiner coût, latence, capacités, fournisseurs approuvés et confidentialité en entreprise. V1 n'est pas une plateforme IAM complète. Un adaptateur local compatible OpenAI pour Ollama, vLLM ou LM Studio serait une extension naturelle ; il n'est pas inclus.
+- **Délégation délimitée et second avis :** transmettre TASK et CONTEXT fournis par l'appelant à Gemini ou Anthropic et examiner la réponse. L'appelant décide de son emploi.
+- **Extraction avec preuves :** demander des résultats structurés et vérifier localement les citations dans le contexte fourni. Cela vérifie leur emplacement, pas leur vérité.
+- **Délégation de longs contextes :** transmettre un texte long et borné à un fournisseur configuré ; aucun gain de tokens ou de coût n'est mesuré.
+- **Comparaison Gemini/Anthropic :** exécuter le même jeu redistribuable sous des conditions explicites, avec manifeste et résultats.
+- **Contraintes de routage :** filtrer confidentialité déclarée, fournisseurs autorisés, capacités et historiques connus de coût et de latence avant sélection.
+- **Recherche sur l'injection de prompt :** utiliser la petite fixture synthétique et son évaluateur déterministe pour de futures études, sans preuve de résistance.
+- **Infrastructure de benchmark et outils MCP :** fonctionner hors ligne avec FakeProvider ou activer des appels réels ; exposer la délégation bornée aux clients MCP compatibles sur loopback.
+
+## Extensions possibles
+
+- Fournisseurs secondaires OpenAI et locaux ou compatibles OpenAI.
+- Jeux de données plus larges et indépendants, autres méthodes d'évaluation.
+- Planification avancée et expériences adaptatives.
+
+La V1 n'est ni un système IAM d'entreprise complet, ni un agent autonome, ni une frontière de sécurité. Voir la [méthodologie](methodology.md) et le [guide d'extension](extending.md).

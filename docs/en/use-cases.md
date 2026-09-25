@@ -2,17 +2,20 @@
 
 English | [Français](../fr/use-cases.md)
 
-| Use case | V1 status | What V1 actually provides |
-| --- | --- | --- |
-| Long-context offloading | Available | Bounded text delegation; no claim of savings. |
-| Independent second opinion | Available | Manual second-provider call; the caller checks it. |
-| Evidence-backed extraction | Available | Structured findings and local quotation offsets/hash. |
-| Cross-provider comparison | Available | Same benchmark primitives for Gemini/Anthropic/Fake. |
-| Prompt-injection research | Available | Synthetic dataset and narrow deterministic evaluator. |
-| Secondary-model error detection | Possible extension | Synthetic wrong-answer fixture; no orchestrator correction experiment yet. |
-| Cost-constrained routing | Available | Strict caps reject unknown cost unless explicitly allowed. |
-| Latency-constrained routing | Available | Historical measured latency filter; no future guarantee. |
-| Privacy-constrained routing | Available | Caller-declared modes and provider allowlists. |
-| Future model scheduling | Future research | No scheduler or adaptive learning in V1. |
+## Available in V1
 
-These constraints can help evaluate enterprise requirements for cost, latency, capabilities, provider approval, and privacy. V1 is not a complete enterprise IAM or policy platform. A local OpenAI-compatible adapter for Ollama, vLLM, or LM Studio is a plausible next extension; it is not included yet.
+- **Bounded delegation and second opinion:** send caller-supplied TASK and CONTEXT to Gemini or Anthropic, then inspect the returned answer. The caller decides whether and how to use it.
+- **Evidence-backed extraction:** request structured findings and verify quotations against the supplied context locally. This checks quotation location, not factual truth.
+- **Long-context delegation:** pass a bounded long text to a configured provider; token or cost savings are unmeasured.
+- **Gemini/Anthropic comparison:** run the same redistributable dataset under explicitly selected conditions, with manifest and result records.
+- **Explicit routing constraints:** filter by declared privacy mode, allowlist, capabilities, and known historical cost/latency before choosing a provider.
+- **Prompt-injection research:** use the small synthetic fixture and deterministic evaluator as infrastructure for further study, not as proof of resistance.
+- **Benchmark infrastructure and MCP tools:** run offline with FakeProvider or opt into real API calls; expose bounded delegation to compatible MCP clients on loopback.
+
+## Possible extensions
+
+- OpenAI and local or OpenAI-compatible secondary providers.
+- Larger, independently sourced datasets and additional evaluation methods.
+- More advanced scheduling and adaptive experiments.
+
+V1 is not a complete enterprise IAM system, autonomous agent, or security boundary. See the [methodology](methodology.md) and [extension guide](extending.md).
