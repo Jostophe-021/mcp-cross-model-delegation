@@ -42,13 +42,12 @@ Python 3.12 or 3.13 and [uv](https://docs.astral.sh/uv/) are supported. A Gemini
 git clone https://github.com/Jostophe-021/mcp-cross-model-delegation.git
 cd mcp-cross-model-delegation
 uv sync --locked --extra all --extra test
-source .venv/bin/activate
-crossmodel doctor
-crossmodel providers
-crossmodel bench run benchmarks/datasets/basic.jsonl
+uv run crossmodel doctor
+uv run crossmodel providers
+uv run crossmodel bench run benchmarks/datasets/basic.jsonl
 ```
 
-The benchmark above uses `FakeProvider` and needs no API key. Set `GEMINI_API_KEY` or `ANTHROPIC_API_KEY` only when you want to call a real provider.
+The benchmark above uses `FakeProvider` and needs no API key. **Software validation only — not an LLM performance result.** Set `GEMINI_API_KEY` or `ANTHROPIC_API_KEY` only when you want to call a real provider.
 
 Or install only the needed adapter: `pip install "mcp-cross-model-delegation[gemini]"` or `pip install "mcp-cross-model-delegation[anthropic]"`. The base package needs neither provider SDK for offline benchmarks. PyPI publication is a separate release step; until then, install from the repository with `uv sync`.
 
@@ -100,7 +99,7 @@ uv build
 docker build -t mcp-cross-model-delegation:1.0.0 .
 ```
 
-The Docker image contains no API keys. Under Linux, `docker run --rm --network host --env-file .env mcp-cross-model-delegation:1.0.0` keeps the MCP listener on host loopback. Docker Desktop host networking varies; local Python is the simpler option. The future public OCI tag is `ghcr.io/jostophe-021/mcp-cross-model-delegation:1.0.0`; its release workflow adds an SPDX SBOM. The optional [OpenAI Secure MCP Tunnel](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels) can connect a compatible remote client without opening an inbound port; this repository includes no tunnel identifier or credential.
+The Docker image contains no API keys. Under Linux, `docker run --rm --network host --env-file .env mcp-cross-model-delegation:1.0.0` keeps the MCP listener on host loopback. Docker Desktop host networking varies; local Python is the simpler option. The release workflow publishes `ghcr.io/jostophe-021/mcp-cross-model-delegation:1.0.0` with OCI metadata and an SPDX SBOM. The optional [OpenAI Secure MCP Tunnel](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels) can connect a compatible remote client without opening an inbound port; this repository includes no tunnel identifier or credential.
 
 ## This is not
 

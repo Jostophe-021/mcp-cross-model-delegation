@@ -1,10 +1,15 @@
-# Proposed v1.0.0 release notes
+# v1.0.0 — Stable Cross-Model Routing & Evaluation Framework
 
-**Tag:** `v1.0.0`
-**Title:** v1.0.0 — Stable Cross-Model Routing & Evaluation Framework
+MCP Cross-Model Delegation is a small, local-first framework for measuring, comparing, routing, and verifying bounded work across language models.
 
-This release introduces optional Gemini and Anthropic providers behind one small provider contract. It adds constraint-first, explainable routing with `manual`, `rules`, and `benchmark_weighted` policies; local quotation verification; a reproducible benchmark runner; a CLI; and generic MCP tools. The Gemini V0.1 tool names remain available as compatibility aliases. The server keeps local-first defaults and does not expose an unauthenticated public listener.
+## Included in this release
 
-This release provides the framework and reproducible synthetic validation. It does not claim that cross-model delegation improves quality, cost or latency without measured experiments. Live API experiments require explicit opt-in and separate API access.
+- Optional Gemini and Anthropic provider adapters, plus a deterministic `FakeProvider` for offline validation.
+- Constraint-first routing with `manual`, `rules`, and `benchmark_weighted` policies, explainable `RoutingDecision` records, privacy-aware constraints, and explicit fallback tracing.
+- Local quotation verification against the supplied context.
+- A reproducible benchmark runner with deterministic evaluators, CLI commands, and generic MCP tools. The V0.1 Gemini tool names remain as compatibility aliases.
+- English and French documentation, local-first security defaults, OCI metadata and SPDX SBOM release workflow, and MCP Registry-ready metadata.
 
-Publish these notes only after PR approval, merge, release checks, and creation of the tag and OCI image. The matching [French notes](../fr/release-notes-v1.0.0.md) are part of the release draft.
+The five-minute offline demo is `uv run crossmodel bench run benchmarks/datasets/basic.jsonl` after `uv sync --locked --extra all --extra test`. It needs no API key. Live provider calls require separate credentials and explicit opt-in.
+
+**This release provides the framework and reproducible synthetic validation. It does not claim that cross-model delegation improves quality, cost, latency or token usage without measured experiments.**

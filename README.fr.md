@@ -42,13 +42,12 @@ Python 3.12 ou 3.13 et [uv](https://docs.astral.sh/uv/) sont pris en charge. Les
 git clone https://github.com/Jostophe-021/mcp-cross-model-delegation.git
 cd mcp-cross-model-delegation
 uv sync --locked --extra all --extra test
-source .venv/bin/activate
-crossmodel doctor
-crossmodel providers
-crossmodel bench run benchmarks/datasets/basic.jsonl
+uv run crossmodel doctor
+uv run crossmodel providers
+uv run crossmodel bench run benchmarks/datasets/basic.jsonl
 ```
 
-Ce benchmark utilise `FakeProvider` et ne demande aucune clé API. Définissez `GEMINI_API_KEY` ou `ANTHROPIC_API_KEY` seulement pour appeler un vrai fournisseur.
+Ce benchmark utilise `FakeProvider` et ne demande aucune clé API. **Validation du logiciel uniquement — pas un résultat de performance des LLM.** Définissez `GEMINI_API_KEY` ou `ANTHROPIC_API_KEY` seulement pour appeler un vrai fournisseur.
 
 On peut aussi n'installer que l'adaptateur nécessaire : `pip install "mcp-cross-model-delegation[gemini]"` ou `pip install "mcp-cross-model-delegation[anthropic]"`. Le paquet de base n'exige aucun des deux SDK pour les benchmarks hors ligne. La publication PyPI est une étape distincte ; jusque-là, utilisez `uv sync` depuis le dépôt.
 
@@ -100,7 +99,7 @@ uv build
 docker build -t mcp-cross-model-delegation:1.0.0 .
 ```
 
-L'image ne contient aucune clé. Sous Linux, `docker run --rm --network host --env-file .env mcp-cross-model-delegation:1.0.0` conserve l'écoute sur loopback ; le réseau hôte de Docker Desktop varie selon la plateforme. Le futur tag public est `ghcr.io/jostophe-021/mcp-cross-model-delegation:1.0.0` et le workflow de release ajoute une SBOM SPDX. Le [Secure MCP Tunnel d'OpenAI](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels) est facultatif pour un client distant compatible ; ce dépôt ne contient aucun identifiant de tunnel ni secret.
+L'image ne contient aucune clé. Sous Linux, `docker run --rm --network host --env-file .env mcp-cross-model-delegation:1.0.0` conserve l'écoute sur loopback ; le réseau hôte de Docker Desktop varie selon la plateforme. Le workflow de release publie `ghcr.io/jostophe-021/mcp-cross-model-delegation:1.0.0` avec les métadonnées OCI et une SBOM SPDX. Le [Secure MCP Tunnel d'OpenAI](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels) est facultatif pour un client distant compatible ; ce dépôt ne contient aucun identifiant de tunnel ni secret.
 
 ## Ce que ce projet n'est pas
 

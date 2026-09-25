@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0 — proposed, unreleased
+## 1.0.0 — 2026-09-25
 
 - Stabilizes the small Provider, RoutingConstraints, RoutingDecision, DelegationResult, and benchmark record contracts.
 - Adds Anthropic and deterministic Fake providers alongside Gemini.
@@ -10,7 +10,7 @@
 - Retains both Gemini MCP tool names as compatibility aliases.
 - Prepares optional SDK extras, CI package/Docker checks, and V1 OCI SBOM release workflow.
 
-V1 stabilizes these contracts because they are the minimum common interface needed to measure, compare, route, and verify bounded work. Future incompatible changes follow Semantic Versioning. This entry does not announce a release; merge and release are separate decisions.
+V1 stabilizes these contracts because they are the minimum common interface needed to measure, compare, route, and verify bounded work. Future incompatible changes follow Semantic Versioning.
 
 ## 0.1.0 — Experimental Research Preview
 

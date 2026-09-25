@@ -4,7 +4,7 @@ English | [Français](SECURITY.fr.md)
 
 ## Reporting
 
-Please use GitHub's **private vulnerability reporting** for this repository if it is enabled. If no private channel is available, open a public issue containing only a minimal, non-sensitive request to establish a private reporting channel. Do not post exploit details, API keys, real prompts, user data, or private infrastructure information in a public issue or pull request. No security email address is claimed here.
+Please use GitHub's **private vulnerability reporting** for this repository. Do not post exploit details, API keys, real prompts, user data, or private infrastructure information in a public issue or pull request. No security email address is claimed here.
 
 ## Scope and current risks
 

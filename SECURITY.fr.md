@@ -4,7 +4,7 @@
 
 ## Signalement
 
-Utilisez le **signalement privé de vulnérabilité** de GitHub pour ce dépôt s'il est activé. Si aucun canal privé n'est disponible, ouvrez une issue publique contenant uniquement une demande minimale et non sensible de mise en place d'un canal privé. Ne publiez pas les détails d'exploitation, les clés API, les vrais prompts, les données utilisateur ou les informations d'infrastructure privée dans une issue ou pull request publique. Aucune adresse e-mail de sécurité n'est prétendue ici.
+Utilisez le **signalement privé de vulnérabilité** de GitHub pour ce dépôt. Ne publiez pas les détails d'exploitation, les clés API, les vrais prompts, les données utilisateur ou les informations d'infrastructure privée dans une issue ou pull request publique. Aucune adresse e-mail de sécurité n'est prétendue ici.
 
 ## Périmètre et risques actuels
 
