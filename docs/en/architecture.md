@@ -6,16 +6,16 @@ English | [Français](../fr/architecture.md)
 flowchart TD
     A[Orchestrating LLM] --> B[MCP client]
     B --> C[MCP server on loopback]
-    C --> D[Gateway: validation and prompt construction]
-    D --> E[DelegationProvider protocol]
-    E --> F[GeminiProvider]
-    F --> G[Gemini API]
-    G --> F --> D --> C --> B
-    B --> H[Orchestrator verification and synthesis]
+    C --> D[Router: filter then select]
+    D --> E[Gateway: validation and TASK/CONTEXT]
+    E --> F[Gemini or Anthropic provider]
+    F --> G[External API]
+    G --> F --> H[Local EvidenceVerifier]
+    H --> C --> B
 ```
 
-The MCP client and local host are inside the deployment's first trust boundary. `server.py` exposes two read-only text tools over streamable HTTP at `/mcp`, with a loopback-only default. It does not authenticate clients, so a remote listener is refused. `gateway.py` validates types, strips and bounds inputs, separates TASK and CONTEXT in JSON, checks outputs, and maps failures to fixed public errors. `providers/base.py` defines `DelegationProvider`; `providers/gemini.py` owns all Gemini SDK calls. The Gemini API is a third-party trust boundary. The orchestrator decides whether to send data and must verify responses.
+The MCP client and local host are inside the deployment's first trust boundary. `server.py` exposes four text tools over streamable HTTP at `/mcp`: two generic tools and two Gemini compatibility aliases. It does not authenticate clients, so a remote listener is refused. `routing.py` filters configured providers by privacy, capabilities, and strict cost/latency limits before applying `manual`, `rules`, or `benchmark_weighted`. The Router never calls an API. `execution.py` then uses the selected adapter and can use one explicit fallback after a retryable error. Its trace contains decision, provider, latency, error, and source hash, but no prompt or full response.
 
-The current adapter uses stateless Interactions calls with `store=False`, timeout, low thinking level, output-token cap, and JSON-schema response format for extraction. These calls do not enable Gemini's external tools. No database, custom telemetry, or prompt/response persistence is implemented. The provider contract is intentionally small; future provider-specific model settings belong behind the adapter, while common input and output rules remain in the gateway.
+`gateway.py` validates and bounds inputs, separates TASK and CONTEXT in JSON, checks outputs, and maps failures to fixed public errors. `providers/base.py` defines the short `DelegationProvider` contract. The Gemini adapter uses stateless Interactions with `store=False`; the Anthropic adapter uses Messages with SDK retries disabled. Neither adapter enables external model tools. `evidence.py` computes exact or whitespace-normalized quotation spans and a SHA-256 of CONTEXT. This verifies textual presence, not factual truth. `benchmarks/runner.py` uses these same Router/executor primitives, plus deterministic evaluators and JSONL files. No database, custom telemetry, or prompt/response persistence is required.
 
-An optional private tunnel can transport requests from a compatible remote MCP client to this local endpoint. It changes connectivity, not the data-sharing decision or Gemini trust boundary. See [deployment-example.md](deployment-example.md) and [security-model.md](security-model.md).
+An optional private tunnel can transport requests from a compatible remote MCP client to this local endpoint. It changes connectivity, not the data-sharing decision or provider trust boundary. See [deployment-example.md](deployment-example.md), [security-model.md](security-model.md), and [methodology.md](methodology.md).

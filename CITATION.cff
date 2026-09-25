@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software in research, cite the repository and the exact version or commit."
+title: "MCP Cross-Model Delegation"
+authors:
+  - name: "Jostophe-021"
+repository-code: "https://github.com/Jostophe-021/mcp-cross-model-delegation"
+license: "Apache-2.0"
+type: software
+version: 1.0.0
+date-released: 2026-09-25

@@ -2,121 +2,109 @@
 
 [English](README.md) | Français
 
-**Un pont MCP attentif à la sécurité et un banc d'essai de recherche sur la délégation entre modèles de langage.**
+[![Tests](https://github.com/Jostophe-021/mcp-cross-model-delegation/actions/workflows/tests.yml/badge.svg)](https://github.com/Jostophe-021/mcp-cross-model-delegation/actions/workflows/tests.yml)
+[![Sécurité](https://github.com/Jostophe-021/mcp-cross-model-delegation/actions/workflows/security.yml/badge.svg)](https://github.com/Jostophe-021/mcp-cross-model-delegation/actions/workflows/security.yml)
+![Python 3.12 et 3.13](https://img.shields.io/badge/python-3.12%20%7C%203.13-blue)
+[![Licence : Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-**Statut : expérimental / aperçu de recherche (v0.1.0).** Cet exemple réduit, conçu d'abord pour un usage local, sert à étudier si la délégation de tâches délimitées aide un modèle orchestrateur. Il n'est pas prêt pour la production et ne prétend pas que la délégation améliore la qualité, la vitesse, le coût ou la consommation de tokens. Le premier fournisseur secondaire est Gemini ; le contrat fournisseur permet d'en ajouter d'autres sans modifier les outils MCP.
+**Un cadre ouvert, reproductible et attentif à la sécurité pour mesurer, comparer, router et vérifier des tâches délimitées entre modèles de langage hétérogènes.**
 
-## Pourquoi ce projet existe
-
-Un orchestrateur peut rencontrer une tâche délimitée ou un long contexte qu'un second modèle pourrait traiter. L'hypothèse est que la délégation **pourrait** réduire la charge de contexte de l'orchestrateur ou améliorer certains traitements spécialisés, mais qu'elle peut aussi ajouter de la latence, des coûts, des risques de confidentialité et une propagation des erreurs. Ce dépôt fournit un pont inspectable et un plan de mesure ; il ne contient aucun résultat expérimental. Voir la [feuille de route de recherche](docs/fr/research-roadmap.md) et le [schéma des benchmarks](benchmarks/benchmark_schema.json).
+Un même noyau Python alimente un serveur MCP et une CLI de benchmark : **mesurer → comparer → router → vérifier → améliorer**. La V1 prend en charge Gemini, Anthropic et un fournisseur factice déterministe pour les tests hors ligne. Le routage est explicite, les citations sont vérifiées localement et aucun gain de qualité, de coût ou de latence n'est revendiqué sans mesure.
 
 ```mermaid
-flowchart TD
-    A[LLM orchestrateur] --> B[Client MCP]
-    B --> C[Serveur MCP local de délégation]
-    C --> D[Validation et frontière de prompt]
-    D --> E[DelegationProvider]
-    E --> F[API Gemini]
-    F --> E --> D --> C --> B
-    B --> G[Vérification et synthèse par l'orchestrateur]
+flowchart LR
+    A["TASK + CONTEXT"] --> B["Contraintes de l'appelant"]
+    B --> C["Router"]
+    H["Historique de benchmark"] -. "politique pondérée" .-> C
+    C --> D["Gemini ou Anthropic"]
+    D --> E["Résultat"]
+    E --> F["Vérification locale des citations<br/>pour l'extraction"]
+    E --> G["Évaluation de benchmark optionnelle"]
+    F --> G
 ```
 
-L'orchestrateur choisit les données à transmettre. Le serveur MCP valide et borne le texte. `GeminiProvider` appelle Gemini. L'orchestrateur doit vérifier la réponse ; le pont ne vérifie pas son exactitude factuelle.
+## Ce que vous pouvez faire aujourd'hui
+
+- Déléguer une tâche textuelle délimitée à Gemini ou Anthropic avec la même interface.
+- Appliquer des contraintes de confidentialité, capacité, coût et latence avant la sélection ; inspecter les raisons du choix.
+- Vérifier les citations extraites dans le contexte fourni.
+- Lancer des benchmarks hors ligne sans clé API, ou activer explicitement des expériences entre fournisseurs réels.
+
+## Pourquoi ce projet est différent
+
+La même boucle mesure, route, exécute, vérifie les preuves et évalue les résultats. La politique par défaut est `manual` ; `rules` et `benchmark_weighted` demandent un choix explicite. Un score historique ne garantit ni la latence ni la qualité future. Voir l'[architecture](docs/fr/architecture.md), la [méthodologie](docs/fr/methodology.md) et les [cas d'usage](docs/fr/use-cases.md).
+
+## Installer et démarrer
+
+Python 3.12 ou 3.13 et [uv](https://docs.astral.sh/uv/) sont pris en charge. Les clés API Gemini et Anthropic sont indépendantes : configurez l'une ou les deux. Un abonnement Claude ne fournit pas de crédits API Anthropic.
+
+```bash
+git clone https://github.com/Jostophe-021/mcp-cross-model-delegation.git
+cd mcp-cross-model-delegation
+uv sync --locked --extra all --extra test
+uv run crossmodel doctor
+uv run crossmodel providers
+uv run crossmodel bench run benchmarks/datasets/basic.jsonl
+```
+
+Ce benchmark utilise `FakeProvider` et ne demande aucune clé API. **Validation du logiciel uniquement — pas un résultat de performance des LLM.** Définissez `GEMINI_API_KEY` ou `ANTHROPIC_API_KEY` seulement pour appeler un vrai fournisseur.
+
+Depuis ce dépôt, installez seulement l'adaptateur nécessaire avec `uv sync --locked --extra gemini` ou `uv sync --locked --extra anthropic`. Le paquet de base n'exige aucun des deux SDK pour les benchmarks hors ligne. La publication PyPI est une étape distincte ; installez depuis le dépôt tant qu'une publication PyPI n'est pas vérifiée.
+
+Définissez `GEMINI_API_KEY` et/ou `ANTHROPIC_API_KEY` dans votre environnement. `.env.example` n'a que des exemples ; ne commitez jamais `.env` et ne collez pas de clé dans une commande, issue ou conversation. Définissez `DEFAULT_PROVIDER=anthropic` pour choisir Anthropic par défaut en mode manuel. `crossmodel serve` expose MCP HTTP à `http://127.0.0.1:8000/mcp`. `MCP_HOST=0.0.0.0` est refusé faute d'authentification publique.
 
 ## Outils MCP
 
-| Outil | Entrée | Résultat |
-| --- | --- | --- |
-| `gemini_delegate_task` | `task` requis, `context` facultatif | `{"model":"...","answer":"..."}` |
-| `gemini_extract_findings` | `question` et `context` requis | `summary`, jusqu'à 20 éléments `findings` avec `finding`, `evidence`, `source_label`, `uncertainty` et `model` |
+| Outil | Rôle |
+| --- | --- |
+| `delegate_task` | Déléguer une TASK avec CONTEXT, fournisseur, politique et contraintes optionnels. |
+| `extract_findings` | Extraire des résultats structurés et localiser les citations dans CONTEXT. |
+| `gemini_delegate_task`, `gemini_extract_findings` | Alias compatibles V0.1, Gemini et politique manuelle. |
 
-Les deux outils acceptent du **texte fourni par l'appelant**. Ils ne lisent pas automatiquement Google Drive, les e-mails, les fichiers ni les applications de l'utilisateur ; ils n'exécutent pas de code et n'agissent pas dans ces applications. Ils ne garantissent aucune exactitude. Les preuves proposées par Gemini sont des affirmations à comparer au texte original.
+Les outils génériques utilisent `policy="manual"` par défaut. `provider` suit `DEFAULT_PROVIDER`, puis Gemini si configuré, puis le premier fournisseur configuré. Activez explicitement `policy="rules"` ou `policy="benchmark_weighted"`. Pour le routage pondéré dans MCP, l'opérateur définit `CROSSMODEL_HISTORY_PATH` vers un fichier local/public `history.json` issu d'un benchmark ; l'appelant ne choisit pas le chemin. Les contraintes comprennent `allowed_providers`, `privacy_mode`, `approved_providers`, `max_cost`, `max_latency`, `require_structured_output`, `require_evidence`, `fallback_allowed` et `allow_unknown_cost`. Un plafond strict rejette les coûts ou latences inconnus. `privacy_mode="local_only"` rejette les deux fournisseurs externes inclus avec `NO_ELIGIBLE_PROVIDER`.
 
-Exemples avec données synthétiques :
+Ces outils ne traitent que le texte fourni par l'appelant. Ils ne lisent ni fichiers, ni e-mails, ni Drive, ni applications ; ils n'exécutent pas de code et n'agissent pas dans d'autres services. L'appelant décide quelles données quittent sa machine. TASK et CONTEXT restent des champs JSON distincts ; les instructions dans CONTEXT ne sont pas fiables. C'est une **atténuation, pas une garantie de sécurité**. Voir le [modèle de sécurité](docs/fr/security-model.md).
 
-```text
-gemini_delegate_task(task="Calculate 137 × 29 and explain the calculation briefly.")
-
-gemini_extract_findings(
-    question="What are the two numbers mentioned and their sum?",
-    context="Monday: 12 tickets. Tuesday: 8 tickets."
-)
-```
-
-## Démarrage rapide
-
-Python 3.12+, [`uv`](https://docs.astral.sh/uv/) et une clé API Gemini sont nécessaires aux vrais appels. Les tests n'ont pas besoin de clé.
+## Expliquer une décision
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/mcp-cross-model-delegation.git
-cd mcp-cross-model-delegation
-cp .env.example .env
-# Modifier .env localement et remplacer GEMINI_API_KEY=replace-me par votre clé.
-uv sync --extra test
-uv run --env-file .env python server.py
+crossmodel route explain --policy rules --constraints '{"privacy_mode":"external_allowed"}'
+crossmodel route explain --provider gemini --policy manual
+crossmodel route explain --policy benchmark_weighted --history results/<run-id>/history.json
 ```
 
-Le point d'accès MCP en HTTP streamable est `http://127.0.0.1:8000/mcp`. Configurez un client MCP local avec cette adresse. Git ignore `.env`. Ne collez pas la clé dans une commande, une issue, un journal ou un chat. `GEMINI_MODEL` vaut par défaut `gemini-3.5-flash-lite`, modèle stable documenté par Google ; un autre modèle Gemini pris en charge peut être choisi par variable d'environnement. Vérifiez sa disponibilité et son prix dans votre propre projet.
+Aucun appel API n'est effectué. La commande affiche les fournisseurs admissibles ou rejetés, les codes de raison, la chaîne de repli et les composantes du score. Seules les métriques mesurées et communes aux candidats sont utilisées ; les valeurs manquantes restent `null`.
 
-## Développement local et Docker
+## Benchmark
+
+Par défaut, `FakeProvider` n'appelle aucune API payante. Ses résultats vérifient le logiciel, **pas des hypothèses scientifiques sur les LLM**.
 
 ```bash
-uv sync --extra test
+crossmodel bench run benchmarks/datasets/basic.jsonl
+crossmodel bench report results/<run-id>
+crossmodel bench generate /tmp/long.jsonl --size medium --seed 42
+```
+
+Chaque exécution produit `manifest.json`, `results.jsonl`, `summary.json` et `history.json`. Les résultats omettent TASK, CONTEXT et les réponses par défaut ; ils contiennent un SHA-256 du contexte exact. Le jeu de données contient six petites tâches synthétiques : arithmétique, extraction, preuves, injection de prompt, erreur et long contexte. Le générateur enregistre caractères, seed et version ; les tokens restent `null` avant mesure.
+
+Pour une expérience API, utilisez `--live --provider gemini --orchestrator anthropic` avec vos fournisseurs configurés. La CLI affiche le plan d'appels avant l'exécution. `--repetitions N --shuffle --seed 42` contrôle les répétitions et l'ordre ; la concurrence vaut un. Le coût reste `unavailable` sans source tarifaire datée. `--save-responses` écrit réponses et résultats bruts : ne l'utilisez qu'avec des données redistribuables. Les quatre conditions sont `orchestrator_only`, `fixed_delegation`, `structured_delegation` et `routed_delegation`. V1 mesure un appel par condition, sans seconde étape de synthèse par l'orchestrateur. Voir le [format de benchmark](benchmarks/README.fr.md) et la [méthodologie](docs/fr/methodology.md).
+
+## Développement et image
+
+```bash
+uv sync --locked --extra all --extra test
 uv run pytest -q
-uv run ruff check gateway.py server.py providers tests
+uv run ruff check gateway.py server.py contracts.py routing.py execution.py evidence.py cli.py providers benchmarks tests
+uv build
+docker build -t mcp-cross-model-delegation:1.0.0 .
 ```
 
-```bash
-docker build -t mcp-cross-model-delegation:0.1.0 .
-# Exemple de réseau hôte sous Linux ; le serveur MCP reste lié à loopback.
-docker run --rm --network host --env-file .env mcp-cross-model-delegation:0.1.0
-```
+L'image ne contient aucune clé. Sous Linux, `docker run --rm --network host --env-file .env mcp-cross-model-delegation:1.0.0` conserve l'écoute sur loopback ; le réseau hôte de Docker Desktop varie selon la plateforme. Le workflow de release publie `ghcr.io/jostophe-021/mcp-cross-model-delegation:1.0.0` avec les métadonnées OCI et une SBOM SPDX. Le [Secure MCP Tunnel d'OpenAI](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels) est facultatif pour un client distant compatible ; ce dépôt ne contient aucun identifiant de tunnel ni secret.
 
-L'image ne contient aucune clé. La prise en charge du réseau hôte varie avec Docker Desktop ; utilisez Python directement si elle n'est pas disponible. Le serveur refuse volontairement `MCP_HOST=0.0.0.0`. Pour fournir un point d'accès réseau, ajoutez une authentification client et une protection du transport adaptées au lieu de supprimer cette garde dans un déploiement partagé.
+## Ce que ce projet n'est pas
 
-L'image publique `ghcr.io/jostophe-021/mcp-cross-model-delegation:0.1.0` contient le code de la même release et exige une clé fournie à l'exécution. `server.json` décrit cette image locale et son point d'accès HTTP sur loopback pour le MCP Registry. Une fiche du registre est une métadonnée permettant d'installer un serveur local, pas un service hébergé ; l'exemple Docker ci-dessus nécessite le réseau hôte sous Linux pour accéder au point d'accès.
+- Une affirmation selon laquelle la délégation améliore toujours les résultats ou qu'un fournisseur est supérieur partout.
+- Une plateforme d'agents autonomes, une frontière de sécurité suffisante en production ou une garantie contre l'injection de prompt.
+- Un produit officiel d'OpenAI, d'Anthropic ou de Google.
 
-## Configuration
-
-| Variable | Défaut | Plage sûre ou fonction |
-| --- | --- | --- |
-| `GEMINI_API_KEY` | requise pour les vrais appels | À garder hors des sources et de l'image |
-| `GEMINI_MODEL` | `gemini-3.5-flash-lite` | Identifiant Gemini ; vérifiez vous-même sa disponibilité |
-| `MAX_TASK_CHARS` | `12000` | 1–12000 |
-| `MAX_CONTEXT_CHARS` | `100000` | 1–200000 |
-| `MAX_OUTPUT_TOKENS` | `4096` | 256–8192 |
-| `MODEL_TIMEOUT_SECONDS` | `60` | 1–120 |
-| `MCP_HOST` | `127.0.0.1` | `127.0.0.1` ou `localhost` uniquement |
-| `PORT` | `8000` | 1–65535 |
-
-L'adaptateur Gemini utilise l'API Interactions actuelle avec `store=False`, un délai d'expiration, une sortie bornée et un JSON contraint par schéma pour l'extraction. L'appel SDK est isolé dans `providers/gemini.py` ; `gateway.py` gère la validation et le contrôle des réponses. Les tests utilisent de faux fournisseurs et clients. De futurs fournisseurs OpenAI, Anthropic, Mistral ou locaux pourront implémenter `DelegationProvider` ; aucun ne l'est encore.
-
-## Sécurité et partage des données
-
-**Utiliser l'un des outils transmet à Google la tâche et le contexte fournis.** N'envoyez que les informations dont vous êtes autorisé à disposer ainsi. Les données confidentielles ou personnelles exigent une base juridique, organisationnelle et technique adaptée. Les conditions du fournisseur, la conservation et l'usage des données dépendent du compte et de ses réglages ; consultez la [documentation de l'API Gemini](https://ai.google.dev/gemini-api/docs/logs-datasets) et les conditions applicables. `store=False` désactive la conservation de l'objet Interaction pour chaque requête ; cela ne signifie pas qu'aucun traitement, transport, enregistrement lié au compte ou politique du fournisseur ne s'applique.
-
-**Une frontière entre modèles n'est pas en soi une frontière de sécurité.** TASK et CONTEXT sont encodés dans deux champs JSON distincts, et le prompt indique que les instructions présentes dans CONTEXT ne doivent pas remplacer TASK. Cette séparation réduit le mélange accidentel d'instructions, mais ne garantit pas une résistance aux injections adversariales. Ne déléguez pas de secrets simplement parce que le prompt les appelle « contexte ». L'application ne persiste pas les prompts ou réponses, n'active pas de télémétrie personnalisée et ne journalise pas les charges utiles complètes par défaut. Votre client MCP, votre hôte et le fournisseur peuvent avoir leurs propres journaux.
-
-Le serveur écoute seulement sur loopback et ne possède aucun système d'authentification public. Sa frontière de confiance comprend l'hôte local et le client MCP que vous configurez. Un client, un hôte, une dépendance ou un fournisseur secondaire compromis peut toujours exposer des données ou renvoyer du contenu malveillant. Les échecs transitoires renvoient des objets d'erreur fixes, sans détails sensibles ; ni texte d'exception ni trace de pile ne traversent la frontière MCP. Lisez le [modèle de sécurité](docs/fr/security-model.md) et le [guide de signalement](SECURITY.fr.md).
-
-## Limites et vérification
-
-- La sortie du fournisseur peut être fausse, inventée, incomplète ou malveillante. Vérifiez les réponses importantes et les preuves citées avec des références indépendantes ou le contexte transmis.
-- Le pont ne fait aucune recherche web, lecture de fichier, exécution de code ou action externe. Les autres capacités éventuelles du modèle Gemini ne sont pas activées ici.
-- Les quotas, pannes, expirations et changements de modèle peuvent interrompre les appels. `MODEL_TEMPORARILY_UNAVAILABLE` autorise un nouvel essai ; des répétitions aveugles peuvent augmenter coût et charge.
-- Les limites de caractères et de tokens bornent les requêtes mais n'imposent pas de plafond financier.
-- `store=False` ne supprime pas la décision de partager des données avec un tiers.
-
-## Recherche et benchmarks
-
-La [feuille de route](docs/fr/research-roadmap.md) définit les comparaisons orchestrateur seul, délégation libre, délégation structurée, longs contextes, erreur injectée, résistance aux injections, fidélité des preuves et, plus tard, plusieurs fournisseurs. Le [format de benchmark](benchmarks/README.fr.md) enregistre modèles, configuration, tokens, latence, coût estimé, erreurs et provenance de l'évaluation. Aucun résultat n'est revendiqué. Utilisez au besoin des références humaines, des règles déterministes et des évaluateurs indépendants ; le modèle évalué ne doit pas être le seul juge de sa propre réponse.
-
-## Tunnel MCP sécurisé OpenAI facultatif
-
-Un client MCP local suffit pour utiliser ce projet. Le [Secure MCP Tunnel d'OpenAI](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels) est une méthode **facultative** pour connecter un serveur MCP privé sur loopback à un produit OpenAI compatible, sans ouvrir de port entrant. Il nécessite un tunnel et des identifiants créés séparément dans votre propre compte. Ce dépôt n'en contient aucun. Ce tunnel sert aux connexions privées et au mode développeur ; il n'est pas un point d'accès pour soumettre un plugin public. Voir l'[exemple de déploiement générique](docs/fr/deployment-example.md).
-
-## Contribution, licence et avertissement
-
-Voir [CONTRIBUTING.fr.md](CONTRIBUTING.fr.md), [SECURITY.fr.md](SECURITY.fr.md) et le [Code de conduite](CODE_OF_CONDUCT.md). Les modifications substantielles de documentation et de sécurité doivent être répercutées en anglais et en français avant une release. Licence [Apache-2.0](LICENSE).
-
-Cet aperçu de recherche indépendant n'est affilié ni à OpenAI ni à Google. OpenAI est une marque de son propriétaire ; Gemini et Google sont des marques de leurs propriétaires respectifs. Les utilisateurs doivent respecter les conditions des API et services qu'ils choisissent. Aucune garantie de sécurité, d'exactitude, de coût ou de disponibilité n'est fournie.
+Aucune télémétrie personnalisée n'est activée. Les tokens, coûts ou qualités inconnus restent inconnus. Voir la [feuille de route](docs/fr/research-roadmap.md), le [changelog](CHANGELOG.md), le [guide de contribution](CONTRIBUTING.fr.md), les [Discussions](https://github.com/Jostophe-021/mcp-cross-model-delegation/discussions) et les [informations de citation](CITATION.cff). Licence [Apache-2.0](LICENSE).

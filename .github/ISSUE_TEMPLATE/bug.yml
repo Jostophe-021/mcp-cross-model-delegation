@@ -1,0 +1,53 @@
+name: Bug report
+description: Report a reproducible defect with synthetic data.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: "Never include API keys, credentials, private prompts or confidential data. Sanitize logs and use synthetic examples. Report vulnerabilities through SECURITY.md."
+  - type: input
+    id: version
+    attributes:
+      label: Project version or commit
+      placeholder: "v1.0.0 or commit SHA"
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+      placeholder: "3.12 or 3.13"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: "macOS, Linux, or Windows and version"
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command or steps to reproduce
+      description: Use placeholders for any credentials.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs
+      description: Remove tokens, private prompts, personal data, and internal URLs.
+      render: text

@@ -1,0 +1,47 @@
+name: Benchmark proposal
+description: Propose a reproducible, redistributable evaluation.
+title: "[Benchmark] "
+body:
+  - type: markdown
+    attributes:
+      value: "Use synthetic or redistributable data only. Never include API keys, private prompts, or confidential data. State hypotheses as hypotheses."
+  - type: textarea
+    id: question
+    attributes:
+      label: Research question
+    validations:
+      required: true
+  - type: textarea
+    id: dataset
+    attributes:
+      label: Dataset description and source
+      description: Include version, size, task categories, and provenance.
+    validations:
+      required: true
+  - type: textarea
+    id: evaluator
+    attributes:
+      label: Evaluator and metrics
+      description: Distinguish measured, estimated, and unavailable values.
+    validations:
+      required: true
+  - type: textarea
+    id: providers
+    attributes:
+      label: Providers and model IDs
+    validations:
+      required: true
+  - type: textarea
+    id: reproducibility
+    attributes:
+      label: Reproduction plan
+      description: Include settings, repetitions, seed, expected artifacts, and limitations.
+    validations:
+      required: true
+  - type: textarea
+    id: license
+    attributes:
+      label: Licensing and redistribution status
+      description: State whether dataset, references, and raw results may be published.
+    validations:
+      required: true

@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discussions
+    url: https://github.com/Jostophe-021/mcp-cross-model-delegation/discussions
+    about: Ask questions, propose ideas, or discuss reproducible research.
+  - name: Security policy
+    url: https://github.com/Jostophe-021/mcp-cross-model-delegation/blob/main/SECURITY.md
+    about: Follow the private reporting guidance for vulnerabilities.
+  - name: Contributing guide
+    url: https://github.com/Jostophe-021/mcp-cross-model-delegation/blob/main/CONTRIBUTING.md
+    about: Read the contribution and data-handling guidelines before filing an issue.

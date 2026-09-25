@@ -12,7 +12,7 @@ __pycache__
 *.pyc
 tests
 docs
-benchmarks
+results
 secrets
 credentials
 dist
